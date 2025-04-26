@@ -2,6 +2,7 @@ import pygame
 import sys
 import os
 from game_manager import GameManager
+from common.logger import info, no_print
 
 class BaseUI:
     def __init__(self, width=900, height=700, title="文字选择养成游戏"):
@@ -72,17 +73,17 @@ class MainMenuUI(BaseUI):
         return new_game_rect, load_game_rect, quit_rect
 
     def run(self):
-        print("[MainMenuUI] run() called")
+        info("[MainMenuUI] run() called")
         while True:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    print("[MainMenuUI] Quit event")
+                    info("[MainMenuUI] Quit event")
                     pygame.quit()
                     sys.exit()
                 if self.input_active and event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_RETURN:
                         if self.input_text.strip():
-                            print(f"[MainMenuUI] Switching to GameMainUI with name: {self.input_text.strip()}")
+                            info(f"[MainMenuUI] Switching to GameMainUI with name: {self.input_text.strip()}")
                             self.next_ui = GameMainUI(self.input_text.strip())
                             return
                         else:
@@ -104,11 +105,11 @@ class MainMenuUI(BaseUI):
                         self.input_text = ""
                     elif load_game_rect.collidepoint(mouse_pos):
                         if self.game_manager.load_game():
-                            print(f"[MainMenuUI] Switching to GameMainUI with loaded name: {self.game_manager.character.name}")
+                            info(f"[MainMenuUI] Switching to GameMainUI with loaded name: {self.game_manager.character.name}")
                             self.next_ui = GameMainUI(self.game_manager.character.name, self.game_manager)
                             return
                     elif quit_rect.collidepoint(mouse_pos):
-                        print("[MainMenuUI] Quit button pressed")
+                        info("[MainMenuUI] Quit button pressed")
                         pygame.quit()
                         sys.exit()
             self.show_menu()
@@ -116,7 +117,7 @@ class MainMenuUI(BaseUI):
 
 class GameMainUI(BaseUI):
     def __init__(self, character_name, game_manager=None):
-        print(f"[GameMainUI] __init__ with character_name: {character_name}")
+        info(f"[GameMainUI] __init__ with character_name: {character_name}")
         super().__init__(width=900, height=700)
         if game_manager:
             self.game_manager = game_manager
@@ -127,10 +128,31 @@ class GameMainUI(BaseUI):
         self.save_popup = False
 
     def show_game(self):
-        print("[GameMainUI] show_game called")
+        if self.game_manager.game_state == 'game_over':
+            self.screen.fill((0, 0, 0))
+            status = self.game_manager.get_character_status()
+            y = 30
+            if status:
+                self.draw_text(f"游戏结束！", 30, y, (255, 255, 0))
+                y += 40
+                self.draw_text(f"角色: {status['name']}", 30, y)
+                y += 30
+                self.draw_text(f"等级: {status['level']}", 30, y)
+                y += 30
+                self.draw_text(f"经验: {status['experience']}", 30, y)
+                y += 30
+                self.draw_text(f"天数: {status['day']}/30", 30, y)
+                y += 30
+                for attr, value in status['attributes'].items():
+                    self.draw_text(f"{attr}: {value}", 30, y)
+                    y += 30
+            quit_rect = self.draw_button("退出", 350, y + 60, 200, 50, (255, 255, 255))
+            pygame.display.flip()
+            return [quit_rect]
+        no_print("[GameMainUI] show_game called")
         self.screen.fill((0, 0, 0))
         status = self.game_manager.get_character_status()
-        print(f"[GameMainUI] status: {status}")
+        no_print(f"[GameMainUI] status: {status}")
         y = 30
         if status:
             self.draw_text(f"角色: {status['name']}", 30, y)
@@ -144,15 +166,12 @@ class GameMainUI(BaseUI):
             for attr, value in status['attributes'].items():
                 self.draw_text(f"{attr}: {value}", 30, y)
                 y += 30
-        # 动态计算事件描述区起始y
         desc_y = y + 30
         current_event = self.game_manager.get_current_event()
-        print(f"[GameMainUI] current_event: {current_event}")
+        no_print(f"[GameMainUI] current_event: {current_event}")
         choice_rects = []
         if current_event:
-            # 事件描述区域
             self.draw_text(current_event.description, 30, desc_y)
-            # 选项按钮区域
             btn_y = desc_y + 50
             for i, choice in enumerate(current_event.choices):
                 rect = self.draw_button(choice['text'], 80, btn_y, 740, 40, (255, 255, 255))
@@ -167,25 +186,33 @@ class GameMainUI(BaseUI):
         return choice_rects
 
     def run(self):
-        print("[GameMainUI] run() called")
+        info("[GameMainUI] run() called")
         while True:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    print("[GameMainUI] Quit event")
+                    info("[GameMainUI] Quit event")
                     pygame.quit()
                     sys.exit()
+                if self.game_manager.game_state == 'game_over':
+                    if event.type == pygame.MOUSEBUTTONDOWN:
+                        mouse_pos = pygame.mouse.get_pos()
+                        choice_rects = self.show_game()
+                        if choice_rects and choice_rects[0].collidepoint(mouse_pos):
+                            pygame.quit()
+                            sys.exit()
+                    continue
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     mouse_pos = pygame.mouse.get_pos()
-                    print(f"[GameMainUI] Mouse click at {mouse_pos}")
+                    info(f"[GameMainUI] Mouse click at {mouse_pos}")
                     choice_rects = self.show_game()
                     for i, rect in enumerate(choice_rects):
                         if rect.collidepoint(mouse_pos):
                             if i == len(choice_rects) - 1:
-                                print("[GameMainUI] Save game pressed")
+                                info("[GameMainUI] Save game pressed")
                                 self.game_manager.save_game()
                                 self.save_popup = True
                             else:
-                                print(f"[GameMainUI] Choice {i} pressed")
+                                info(f"[GameMainUI] Choice {i} pressed")
                                 self.game_manager.process_choice(i)
             self.show_game()
             self.clock.tick(60)
@@ -193,6 +220,6 @@ class GameMainUI(BaseUI):
 def run_app():
     current_ui = MainMenuUI()
     while current_ui:
-        print(f"[run_app] Switching to {type(current_ui).__name__}")
+        info(f"[run_app] Switching to {type(current_ui).__name__}")
         current_ui.run()
         current_ui = getattr(current_ui, 'next_ui', None) 
