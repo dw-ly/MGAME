@@ -5,46 +5,25 @@
         "choices": [
             {
                 "text": "去图书馆学习",
-                "effects": [
-                    {
-                        "type": "attribute",
-                        "attribute": "intelligence",
-                        "value": 2
-                    },
-                    {
-                        "type": "experience",
-                        "amount": 50
-                    }
+                "results": [
+                    {"desc": "你在图书馆学到了新知识。", "effects": {"intelligence": 2, "experience": 50}},
+                    {"desc": "你在图书馆遇到了一位老师，获得额外经验。", "effects": {"intelligence": 2, "experience": 80}}
                 ],
                 "next_event": "library"
             },
             {
                 "text": "去健身房锻炼",
-                "effects": [
-                    {
-                        "type": "attribute",
-                        "attribute": "strength",
-                        "value": 2
-                    },
-                    {
-                        "type": "experience",
-                        "amount": 50
-                    }
+                "results": [
+                    {"desc": "你锻炼得很努力，体力提升。", "effects": {"strength": 2, "experience": 50}},
+                    {"desc": "你锻炼时受了点小伤。", "effects": {"strength": 2, "health": -10, "experience": 30}}
                 ],
                 "next_event": "gym"
             },
             {
                 "text": "去参加社交活动",
-                "effects": [
-                    {
-                        "type": "attribute",
-                        "attribute": "charm",
-                        "value": 2
-                    },
-                    {
-                        "type": "experience",
-                        "amount": 50
-                    }
+                "results": [
+                    {"desc": "你结识了新朋友，魅力提升。", "effects": {"charm": 2, "experience": 50}},
+                    {"desc": "你在活动中表现平平。", "effects": {"charm": 1, "experience": 20}}
                 ],
                 "next_event": "social"
             }
@@ -56,31 +35,17 @@
         "choices": [
             {
                 "text": "自己研究解决",
-                "effects": [
-                    {
-                        "type": "attribute",
-                        "attribute": "intelligence",
-                        "value": 3
-                    },
-                    {
-                        "type": "experience",
-                        "amount": 100
-                    }
+                "results": [
+                    {"desc": "你独立解决了难题，智力大增。", "effects": {"intelligence": 3, "experience": 100}},
+                    {"desc": "你花了很久才解决难题。", "effects": {"intelligence": 1, "experience": 50}}
                 ],
                 "next_event": "study"
             },
             {
                 "text": "请教同学",
-                "effects": [
-                    {
-                        "type": "attribute",
-                        "attribute": "charm",
-                        "value": 1
-                    },
-                    {
-                        "type": "experience",
-                        "amount": 50
-                    }
+                "results": [
+                    {"desc": "同学热心帮助你，魅力提升。", "effects": {"charm": 1, "experience": 50}},
+                    {"desc": "同学也不会，大家一起查资料。", "effects": {"intelligence": 1, "experience": 30}}
                 ],
                 "next_event": "ask_help"
             }
@@ -92,36 +57,17 @@
         "choices": [
             {
                 "text": "尝试举重",
-                "effects": [
-                    {
-                        "type": "attribute",
-                        "attribute": "strength",
-                        "value": 3
-                    },
-                    {
-                        "type": "attribute",
-                        "attribute": "health",
-                        "value": -10
-                    },
-                    {
-                        "type": "experience",
-                        "amount": 100
-                    }
+                "results": [
+                    {"desc": "你成功举起了更重的杠铃！", "effects": {"strength": 3, "experience": 100}},
+                    {"desc": "你有些吃力，健康略有下降。", "effects": {"strength": 2, "health": -10, "experience": 50}}
                 ],
                 "next_event": "weight_lifting"
             },
             {
                 "text": "做有氧运动",
-                "effects": [
-                    {
-                        "type": "attribute",
-                        "attribute": "health",
-                        "value": 20
-                    },
-                    {
-                        "type": "experience",
-                        "amount": 50
-                    }
+                "results": [
+                    {"desc": "有氧运动让你精神焕发。", "effects": {"health": 20, "experience": 50}},
+                    {"desc": "你觉得有点累，但还是坚持下来了。", "effects": {"health": 10, "experience": 30}}
                 ],
                 "next_event": "cardio"
             }

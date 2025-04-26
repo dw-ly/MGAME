@@ -16,10 +16,23 @@ class Event:
         return True
 
     def execute_choice(self, choice_index, character):
-        """执行选择并应用效果"""
+        """执行选择并应用效果，支持多结果描述"""
         if 0 <= choice_index < len(self.choices):
             choice = self.choices[choice_index]
-            # 应用选择的效果
+            # 新格式：有results字段
+            if 'results' in choice:
+                result = random.choice(choice['results'])
+                desc = result.get('desc', '')
+                effects = result.get('effects', {})
+                # 应用effects
+                for k, v in effects.items():
+                    if k == 'experience':
+                        character.gain_experience(v)
+                    else:
+                        character.update_attribute(k, v)
+                return desc, choice.get('next_event', None)
+            # 兼容老格式
+            desc = ''
             for effect in choice.get('effects', []):
                 if effect['type'] == 'attribute':
                     character.update_attribute(effect['attribute'], effect['value'])
@@ -32,9 +45,8 @@ class Event:
                     character.update_relationship(effect['character'], effect['value'])
                 elif effect['type'] == 'experience':
                     character.gain_experience(effect['amount'])
-            
-            return choice.get('next_event', None)
-        return None
+            return desc, choice.get('next_event', None)
+        return '', None
 
 class EventManager:
     def __init__(self):
@@ -65,12 +77,16 @@ class EventManager:
         return None
 
     def process_choice(self, choice_index, character):
-        """处理玩家选择"""
+        """处理玩家选择，返回desc"""
         if self.current_event:
-            next_event_id = self.current_event.execute_choice(choice_index, character)
+            result = self.current_event.execute_choice(choice_index, character)
+            if isinstance(result, tuple):
+                desc, next_event_id = result
+            else:
+                desc, next_event_id = '', result
             if next_event_id:
                 self.set_current_event(next_event_id)
             else:
                 self.current_event = None
-            return True
-        return False 
+            return True, desc
+        return False, '' 

@@ -129,9 +129,10 @@ class GameManager:
             return False
 
     def process_choice(self, choice_index):
-        """处理玩家选择"""
+        """处理玩家选择，返回desc"""
         if self.game_state == 'playing' and self.event_manager.current_event:
-            if self.event_manager.process_choice(choice_index, self.character):
+            ok, desc = self.event_manager.process_choice(choice_index, self.character)
+            if ok:
                 self.day += 1
                 # 健康值为0时直接结束游戏
                 if self.character.attributes.get('health', 1) <= 0:
@@ -143,8 +144,8 @@ class GameManager:
                     daily_event = self.event_manager.get_random_daily_event()
                     if daily_event:
                         self.event_manager.current_event = daily_event
-                return True
-        return False
+                return True, desc
+        return False, ''
 
     def get_current_event(self):
         """获取当前事件"""

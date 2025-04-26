@@ -126,6 +126,9 @@ class GameMainUI(BaseUI):
             self.game_manager.start_new_game(character_name)
         self.next_ui = None
         self.save_popup = False
+        self.result_popup = False
+        self.last_status = None
+        self.last_result = None
 
     def show_game(self):
         if self.game_manager.game_state == 'game_over':
@@ -182,6 +185,9 @@ class GameMainUI(BaseUI):
         if self.save_popup:
             self.draw_popup("保存成功！")
             self.save_popup = False
+        if self.result_popup and self.last_result:
+            self.draw_popup(self.last_result, color=(255, 255, 0))
+            self.result_popup = False
         pygame.display.flip()
         return choice_rects
 
@@ -213,7 +219,29 @@ class GameMainUI(BaseUI):
                                 self.save_popup = True
                             else:
                                 info(f"[GameMainUI] Choice {i} pressed")
-                                self.game_manager.process_choice(i)
+                                # 记录选择前的属性
+                                self.last_status = self.game_manager.get_character_status()
+                                current_event = self.game_manager.get_current_event()
+                                choice = current_event.choices[i]
+                                # 处理选择，获取desc
+                                ok, desc = self.game_manager.process_choice(i)
+                                # 记录选择后的属性
+                                new_status = self.game_manager.get_character_status()
+                                # 生成属性变化描述
+                                changes = []
+                                if self.last_status and new_status:
+                                    for attr in self.last_status['attributes']:
+                                        before = self.last_status['attributes'][attr]
+                                        after = new_status['attributes'][attr]
+                                        if before != after:
+                                            changes.append(f"{attr}: {before} → {after}")
+                                    if self.last_status['experience'] != new_status['experience']:
+                                        changes.append(f"经验: {self.last_status['experience']} → {new_status['experience']}")
+                                    if self.last_status['level'] != new_status['level']:
+                                        changes.append(f"等级: {self.last_status['level']} → {new_status['level']}")
+                                result_text = f"{desc}\n" + ("\n".join(changes) if changes else "无属性变化")
+                                self.last_result = result_text
+                                self.result_popup = True
             self.show_game()
             self.clock.tick(60)
 
