@@ -35,14 +35,36 @@ class BaseUI:
         return pygame.Rect(x, y, width, height)
 
     def draw_popup(self, text, color=(0, 255, 0)):
-        popup_rect = pygame.Rect(self.screen.get_width()//2-120, self.screen.get_height()//2-40, 240, 80)
+        lines = text.split('\n')
+        line_height = 28
+        popup_width = 320
+        popup_height = 40 + len(lines) * line_height + 60  # 上下边距+内容+按钮
+        popup_rect = pygame.Rect(
+            self.screen.get_width()//2 - popup_width//2,
+            self.screen.get_height()//2 - popup_height//2,
+            popup_width, popup_height
+        )
         pygame.draw.rect(self.screen, (30, 30, 30), popup_rect)
         pygame.draw.rect(self.screen, color, popup_rect, 2)
-        text_surface = self.font.render(text, True, color)
-        text_rect = text_surface.get_rect(center=popup_rect.center)
-        self.screen.blit(text_surface, text_rect)
+        # 文本
+        for i, line in enumerate(lines):
+            text_surface = self.font.render(line, True, color)
+            text_rect = text_surface.get_rect(
+                center=(popup_rect.centerx, popup_rect.y + 30 + i*line_height)
+            )
+            self.screen.blit(text_surface, text_rect)
+        # 确认按钮
+        btn_rect = pygame.Rect(
+            popup_rect.centerx-50,
+            popup_rect.bottom-50,
+            100, 35
+        )
+        pygame.draw.rect(self.screen, (255,255,255), btn_rect)
+        btn_text = self.font.render("确认", True, (0,0,0))
+        btn_text_rect = btn_text.get_rect(center=btn_rect.center)
+        self.screen.blit(btn_text, btn_text_rect)
         pygame.display.flip()
-        pygame.time.delay(900)
+        return btn_rect
 
 class MainMenuUI(BaseUI):
     def __init__(self):
@@ -186,8 +208,8 @@ class GameMainUI(BaseUI):
             self.draw_popup("保存成功！")
             self.save_popup = False
         if self.result_popup and self.last_result:
-            self.draw_popup(self.last_result, color=(255, 255, 0))
-            self.result_popup = False
+            btn_rect = self.draw_popup(self.last_result, color=(255, 255, 0))
+            return [btn_rect]
         pygame.display.flip()
         return choice_rects
 
@@ -206,6 +228,14 @@ class GameMainUI(BaseUI):
                         if choice_rects and choice_rects[0].collidepoint(mouse_pos):
                             pygame.quit()
                             sys.exit()
+                    continue
+                if self.result_popup and self.last_result:
+                    if event.type == pygame.MOUSEBUTTONDOWN:
+                        mouse_pos = pygame.mouse.get_pos()
+                        btn_rect = self.show_game()[0]
+                        if btn_rect.collidepoint(mouse_pos):
+                            self.result_popup = False
+                            self.last_result = None
                     continue
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     mouse_pos = pygame.mouse.get_pos()
