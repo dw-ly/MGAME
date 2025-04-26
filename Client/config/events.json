@@ -126,5 +126,198 @@
                 "next_event": "cardio"
             }
         ]
-    }
+    },
+    "events": [
+        {
+            "id": 1,
+            "description": "你遇到了一位神秘的老人，他给了你一个选择：",
+            "choices": [
+                {
+                    "text": "接受他的建议，学习一些技能",
+                    "effects": {
+                        "intelligence": 2,
+                        "experience": 10
+                    }
+                },
+                {
+                    "text": "拒绝他的建议，继续前行",
+                    "effects": {
+                        "health": -5
+                    }
+                }
+            ]
+        },
+        {
+            "id": 2,
+            "description": "你在森林中发现了一只受伤的小动物，你会：",
+            "choices": [
+                {
+                    "text": "帮助它，照顾它",
+                    "effects": {
+                        "charm": 2,
+                        "health": -5
+                    }
+                },
+                {
+                    "text": "忽略它，继续前行",
+                    "effects": {
+                        "experience": 5
+                    }
+                }
+            ]
+        },
+        {
+            "id": 3,
+            "description": "你遇到了一群强盗，他们要求你交出财物，你会：",
+            "choices": [
+                {
+                    "text": "与他们战斗",
+                    "effects": {
+                        "strength": 2,
+                        "health": -10
+                    }
+                },
+                {
+                    "text": "交出财物，保命要紧",
+                    "effects": {
+                        "money": -100
+                    }
+                }
+            ]
+        },
+        {
+            "id": 4,
+            "description": "你在市场上发现了一件稀有的物品，你会：",
+            "choices": [
+                {
+                    "text": "购买它，可能有用",
+                    "effects": {
+                        "money": -50,
+                        "experience": 5
+                    }
+                },
+                {
+                    "text": "不买，继续寻找其他物品",
+                    "effects": {
+                        "experience": 2
+                    }
+                }
+            ]
+        },
+        {
+            "id": 5,
+            "description": "你遇到了一位旅行者，他邀请你一起旅行，你会：",
+            "choices": [
+                {
+                    "text": "接受邀请，一起旅行",
+                    "effects": {
+                        "charm": 2,
+                        "experience": 10
+                    }
+                },
+                {
+                    "text": "拒绝邀请，独自前行",
+                    "effects": {
+                        "experience": 5
+                    }
+                }
+            ]
+        },
+        {
+            "id": 6,
+            "description": "你在旅途中遇到了一场暴风雨，你会：",
+            "choices": [
+                {
+                    "text": "寻找避雨的地方",
+                    "effects": {
+                        "health": -5,
+                        "experience": 5
+                    }
+                },
+                {
+                    "text": "继续前行，不顾风雨",
+                    "effects": {
+                        "health": -10,
+                        "strength": 2
+                    }
+                }
+            ]
+        },
+        {
+            "id": 7,
+            "description": "你发现了一个神秘的洞穴，你会：",
+            "choices": [
+                {
+                    "text": "探索洞穴",
+                    "effects": {
+                        "experience": 15,
+                        "health": -5
+                    }
+                },
+                {
+                    "text": "绕过洞穴，继续前行",
+                    "effects": {
+                        "experience": 5
+                    }
+                }
+            ]
+        },
+        {
+            "id": 8,
+            "description": "你在旅途中遇到了一位商人，他有一些稀有的物品，你会：",
+            "choices": [
+                {
+                    "text": "购买一些物品",
+                    "effects": {
+                        "money": -100,
+                        "experience": 10
+                    }
+                },
+                {
+                    "text": "不买，继续前行",
+                    "effects": {
+                        "experience": 5
+                    }
+                }
+            ]
+        },
+        {
+            "id": 9,
+            "description": "你遇到了一位受伤的战士，你会：",
+            "choices": [
+                {
+                    "text": "帮助他，照顾他",
+                    "effects": {
+                        "charm": 2,
+                        "health": -5
+                    }
+                },
+                {
+                    "text": "忽略他，继续前行",
+                    "effects": {
+                        "experience": 5
+                    }
+                }
+            ]
+        },
+        {
+            "id": 10,
+            "description": "你在旅途中遇到了一场战斗，你会：",
+            "choices": [
+                {
+                    "text": "参与战斗",
+                    "effects": {
+                        "strength": 2,
+                        "health": -10
+                    }
+                },
+                {
+                    "text": "避开战斗，继续前行",
+                    "effects": {
+                        "experience": 5
+                    }
+                }
+            ]
+        }
+    ]
 } 

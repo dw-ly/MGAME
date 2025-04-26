@@ -128,6 +128,27 @@ class GameMainUI(BaseUI):
         self.save_popup = False
 
     def show_game(self):
+        if self.game_manager.game_state == 'game_over':
+            self.screen.fill((0, 0, 0))
+            status = self.game_manager.get_character_status()
+            y = 30
+            if status:
+                self.draw_text(f"游戏结束！", 30, y, (255, 255, 0))
+                y += 40
+                self.draw_text(f"角色: {status['name']}", 30, y)
+                y += 30
+                self.draw_text(f"等级: {status['level']}", 30, y)
+                y += 30
+                self.draw_text(f"经验: {status['experience']}", 30, y)
+                y += 30
+                self.draw_text(f"天数: {status['day']}/30", 30, y)
+                y += 30
+                for attr, value in status['attributes'].items():
+                    self.draw_text(f"{attr}: {value}", 30, y)
+                    y += 30
+            quit_rect = self.draw_button("退出", 350, y + 60, 200, 50, (255, 255, 255))
+            pygame.display.flip()
+            return [quit_rect]
         no_print("[GameMainUI] show_game called")
         self.screen.fill((0, 0, 0))
         status = self.game_manager.get_character_status()
@@ -172,6 +193,14 @@ class GameMainUI(BaseUI):
                     info("[GameMainUI] Quit event")
                     pygame.quit()
                     sys.exit()
+                if self.game_manager.game_state == 'game_over':
+                    if event.type == pygame.MOUSEBUTTONDOWN:
+                        mouse_pos = pygame.mouse.get_pos()
+                        choice_rects = self.show_game()
+                        if choice_rects and choice_rects[0].collidepoint(mouse_pos):
+                            pygame.quit()
+                            sys.exit()
+                    continue
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     mouse_pos = pygame.mouse.get_pos()
                     info(f"[GameMainUI] Mouse click at {mouse_pos}")
