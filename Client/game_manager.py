@@ -2,10 +2,11 @@ import json
 import os
 from character import Character
 from event import Event, EventManager
+from common.logger import info, error
 
 class GameManager:
     def __init__(self):
-        print("[GameManager] __init__ called")
+        info("[GameManager] __init__ called")
         self.character = None
         self.event_manager = EventManager()
         self.game_state = 'menu'  # menu, playing, paused, game_over
@@ -13,15 +14,15 @@ class GameManager:
         self.max_days = 30
         self.save_file = 'save.json'
         self.load_events()
-        print(f"[GameManager] events loaded: {list(self.event_manager.events.keys())}")
+        info(f"[GameManager] events loaded: {list(self.event_manager.events.keys())}")
 
     def load_events(self, events_file=None):
         """加载事件数据到事件管理器"""
         if events_file is None:
             events_file = os.path.join(os.path.dirname(__file__), 'config', 'events.json')
-        print(f"[GameManager] load_events from {events_file}")
+        info(f"[GameManager] load_events from {events_file}")
         if not os.path.exists(events_file):
-            print(f"未找到事件数据文件: {events_file}")
+            error(f"未找到事件数据文件: {events_file}")
             return
         try:
             with open(events_file, 'r', encoding='utf-8') as f:
@@ -33,16 +34,16 @@ class GameManager:
                     choices=event_info['choices']
                 )
                 self.event_manager.add_event(event)
-            print(f"已加载事件数据: {len(self.event_manager.events)} 个事件, keys: {list(self.event_manager.events.keys())}")
+            info(f"已加载事件数据: {len(self.event_manager.events)} 个事件, keys: {list(self.event_manager.events.keys())}")
         except Exception as e:
-            print(f"加载事件数据失败: {e}")
+            error(f"加载事件数据失败: {e}")
 
     def start_new_game(self, character_name):
-        print(f"[GameManager] start_new_game called with name: {character_name}")
+        info(f"[GameManager] start_new_game called with name: {character_name}")
         self.character = Character(character_name)
-        print(f"[GameManager] character created: {self.character.name}")
+        info(f"[GameManager] character created: {self.character.name}")
         self.event_manager.set_current_event('start')
-        print(f"[GameManager] set_current_event('start'), current_event: {self.event_manager.current_event}")
+        info(f"[GameManager] set_current_event('start'), current_event: {self.event_manager.current_event}")
         self.game_state = 'playing'
         self.day = 1
 
