@@ -1,0 +1,130 @@
+{
+    "start": {
+        "event_id": "start",
+        "description": "欢迎来到文字选择养成游戏！今天是你的第一天，你决定...",
+        "choices": [
+            {
+                "text": "去图书馆学习",
+                "effects": [
+                    {
+                        "type": "attribute",
+                        "attribute": "intelligence",
+                        "value": 2
+                    },
+                    {
+                        "type": "experience",
+                        "amount": 50
+                    }
+                ],
+                "next_event": "library"
+            },
+            {
+                "text": "去健身房锻炼",
+                "effects": [
+                    {
+                        "type": "attribute",
+                        "attribute": "strength",
+                        "value": 2
+                    },
+                    {
+                        "type": "experience",
+                        "amount": 50
+                    }
+                ],
+                "next_event": "gym"
+            },
+            {
+                "text": "去参加社交活动",
+                "effects": [
+                    {
+                        "type": "attribute",
+                        "attribute": "charm",
+                        "value": 2
+                    },
+                    {
+                        "type": "experience",
+                        "amount": 50
+                    }
+                ],
+                "next_event": "social"
+            }
+        ]
+    },
+    "library": {
+        "event_id": "library",
+        "description": "你在图书馆认真学习，突然遇到一个难题...",
+        "choices": [
+            {
+                "text": "自己研究解决",
+                "effects": [
+                    {
+                        "type": "attribute",
+                        "attribute": "intelligence",
+                        "value": 3
+                    },
+                    {
+                        "type": "experience",
+                        "amount": 100
+                    }
+                ],
+                "next_event": "study"
+            },
+            {
+                "text": "请教同学",
+                "effects": [
+                    {
+                        "type": "attribute",
+                        "attribute": "charm",
+                        "value": 1
+                    },
+                    {
+                        "type": "experience",
+                        "amount": 50
+                    }
+                ],
+                "next_event": "ask_help"
+            }
+        ]
+    },
+    "gym": {
+        "event_id": "gym",
+        "description": "你在健身房锻炼时，遇到一个挑战...",
+        "choices": [
+            {
+                "text": "尝试举重",
+                "effects": [
+                    {
+                        "type": "attribute",
+                        "attribute": "strength",
+                        "value": 3
+                    },
+                    {
+                        "type": "attribute",
+                        "attribute": "health",
+                        "value": -10
+                    },
+                    {
+                        "type": "experience",
+                        "amount": 100
+                    }
+                ],
+                "next_event": "weight_lifting"
+            },
+            {
+                "text": "做有氧运动",
+                "effects": [
+                    {
+                        "type": "attribute",
+                        "attribute": "health",
+                        "value": 20
+                    },
+                    {
+                        "type": "experience",
+                        "amount": 50
+                    }
+                ],
+                "next_event": "cardio"
+            }
+        ]
+    }
+} 
