@@ -1,8 +1,10 @@
 import pygame
 import sys
 import os
+import time
 from game_manager import GameManager
 from common.logger import info, no_print
+from popup import DialogPopup, BannerPopup
 
 class BaseUI:
     def __init__(self, width=900, height=700, title="文字选择养成游戏"):
@@ -34,16 +36,59 @@ class BaseUI:
         self.screen.blit(text_surface, text_rect)
         return pygame.Rect(x, y, width, height)
 
-    def draw_popup(self, text, color=(0, 255, 0)):
-        lines = text.split('\n')
+    def wrap_text(self, text, max_width):
+        # 自动换行辅助函数
+        words = text.split(' ')
+        lines = []
+        current_line = ''
+        for word in words:
+            test_line = current_line + (' ' if current_line else '') + word
+            if self.font.size(test_line)[0] <= max_width:
+                current_line = test_line
+            else:
+                if current_line:
+                    lines.append(current_line)
+                current_line = word
+        if current_line:
+            lines.append(current_line)
+        # 兼容中文（按字符分割）
+        final_lines = []
+        for line in lines:
+            if self.font.size(line)[0] <= max_width:
+                final_lines.append(line)
+            else:
+                temp = ''
+                for ch in line:
+                    if self.font.size(temp + ch)[0] <= max_width:
+                        temp += ch
+                    else:
+                        final_lines.append(temp)
+                        temp = ch
+                if temp:
+                    final_lines.append(temp)
+        return final_lines
+
+    def draw_popup(self, text, color=(0, 255, 0), top=False):
+        # 自动换行
+        max_width = 320 - 40  # 留出边距
+        lines = []
+        for para in text.split('\n'):
+            lines.extend(self.wrap_text(para, max_width))
         line_height = 28
         popup_width = 320
         popup_height = 40 + len(lines) * line_height + 60  # 上下边距+内容+按钮
-        popup_rect = pygame.Rect(
-            self.screen.get_width()//2 - popup_width//2,
-            self.screen.get_height()//2 - popup_height//2,
-            popup_width, popup_height
-        )
+        if top:
+            popup_rect = pygame.Rect(
+                self.screen.get_width()//2 - popup_width//2,
+                40,  # 距离顶部40像素
+                popup_width, popup_height
+            )
+        else:
+            popup_rect = pygame.Rect(
+                self.screen.get_width()//2 - popup_width//2,
+                self.screen.get_height()//2 - popup_height//2,
+                popup_width, popup_height
+            )
         pygame.draw.rect(self.screen, (30, 30, 30), popup_rect)
         pygame.draw.rect(self.screen, color, popup_rect, 2)
         # 文本
@@ -53,18 +98,22 @@ class BaseUI:
                 center=(popup_rect.centerx, popup_rect.y + 30 + i*line_height)
             )
             self.screen.blit(text_surface, text_rect)
-        # 确认按钮
-        btn_rect = pygame.Rect(
-            popup_rect.centerx-50,
-            popup_rect.bottom-50,
-            100, 35
-        )
-        pygame.draw.rect(self.screen, (255,255,255), btn_rect)
-        btn_text = self.font.render("确认", True, (0,0,0))
-        btn_text_rect = btn_text.get_rect(center=btn_rect.center)
-        self.screen.blit(btn_text, btn_text_rect)
-        pygame.display.flip()
-        return btn_rect
+        # 只为事件弹窗绘制确认按钮，保存弹窗不绘制
+        if text != "保存成功！":
+            btn_rect = pygame.Rect(
+                popup_rect.centerx-50,
+                popup_rect.bottom-50,
+                100, 35
+            )
+            pygame.draw.rect(self.screen, (255,255,255), btn_rect)
+            btn_text = self.font.render("确认", True, (0,0,0))
+            btn_text_rect = btn_text.get_rect(center=btn_rect.center)
+            self.screen.blit(btn_text, btn_text_rect)
+            pygame.display.flip()
+            return btn_rect
+        else:
+            pygame.display.flip()
+            return None
 
 class MainMenuUI(BaseUI):
     def __init__(self):
@@ -82,17 +131,37 @@ class MainMenuUI(BaseUI):
         new_game_rect = self.draw_button("新游戏", 350, 240, 200, 50, (255, 255, 255))
         load_game_rect = self.draw_button("加载游戏", 350, 320, 200, 50, (255, 255, 255))
         quit_rect = self.draw_button("退出", 350, 400, 200, 50, (255, 255, 255))
+        start_btn_rect = None
         if self.show_input_box:
             self.draw_text("请输入角色名称：", 320, 500)
-            pygame.draw.rect(self.screen, (255, 255, 255), self.input_box_rect, 2 if self.input_active else 1)
+            # 输入框和按钮整体居中
+            input_box_width = 300
+            input_box_height = 40
+            start_btn_width = 80
+            gap = 20
+            total_width = input_box_width + gap + start_btn_width
+            center_x = self.screen.get_width() // 2
+            input_box_x = center_x - total_width // 2
+            input_box_y = 570
+            self.input_box_rect = pygame.Rect(input_box_x, input_box_y, input_box_width, input_box_height)
+            # 输入框高亮
+            border_color = (255, 255, 0) if self.input_active else (255, 255, 255)
+            pygame.draw.rect(self.screen, border_color, self.input_box_rect, 3 if self.input_active else 2)
             input_surface = self.font.render(self.input_text, True, (255, 255, 255))
             self.screen.blit(input_surface, (self.input_box_rect.x + 10, self.input_box_rect.y + 5))
+            # 开始按钮
+            start_btn_rect = pygame.Rect(self.input_box_rect.right + gap, input_box_y, start_btn_width, input_box_height)
+            pygame.draw.rect(self.screen, (255, 255, 255), start_btn_rect)
+            btn_text = self.font.render("开始", True, (0, 0, 0))
+            btn_text_rect = btn_text.get_rect(center=start_btn_rect.center)
+            self.screen.blit(btn_text, btn_text_rect)
+            # 输入法提示
             tip = "* 建议切换为英文输入法，否则部分输入法无法输入 *"
             tip_surface = self.font.render(tip, True, (255, 200, 100))
             tip_rect = tip_surface.get_rect(center=(self.screen.get_width() // 2, self.input_box_rect.y + self.input_box_rect.height + 20))
             self.screen.blit(tip_surface, tip_rect)
         pygame.display.flip()
-        return new_game_rect, load_game_rect, quit_rect
+        return new_game_rect, load_game_rect, quit_rect, start_btn_rect
 
     def run(self):
         info("[MainMenuUI] run() called")
@@ -102,25 +171,34 @@ class MainMenuUI(BaseUI):
                     info("[MainMenuUI] Quit event")
                     pygame.quit()
                     sys.exit()
-                if self.input_active and event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_RETURN:
+                if self.input_active:
+                    if event.type == pygame.KEYDOWN:
+                        if event.key == pygame.K_RETURN:
+                            if self.input_text.strip():
+                                info(f"[MainMenuUI] Switching to GameMainUI with name: {self.input_text.strip()}")
+                                self.next_ui = GameMainUI(self.input_text.strip())
+                                return
+                            else:
+                                self.input_text = ""
+                        elif event.key == pygame.K_BACKSPACE:
+                            self.input_text = self.input_text[:-1]
+                    elif event.type == pygame.TEXTINPUT:
+                        # 支持中文输入
+                        if len(self.input_text) < 12:
+                            self.input_text += event.text
+                    continue
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    mouse_pos = pygame.mouse.get_pos()
+                    new_game_rect, load_game_rect, quit_rect, start_btn_rect = self.show_menu()
+                    if self.show_input_box and self.input_box_rect.collidepoint(mouse_pos):
+                        self.input_active = True
+                    elif self.show_input_box and start_btn_rect and start_btn_rect.collidepoint(mouse_pos):
                         if self.input_text.strip():
                             info(f"[MainMenuUI] Switching to GameMainUI with name: {self.input_text.strip()}")
                             self.next_ui = GameMainUI(self.input_text.strip())
                             return
                         else:
                             self.input_text = ""
-                    elif event.key == pygame.K_BACKSPACE:
-                        self.input_text = self.input_text[:-1]
-                    else:
-                        if len(self.input_text) < 12:
-                            self.input_text += event.unicode
-                    continue
-                if event.type == pygame.MOUSEBUTTONDOWN:
-                    mouse_pos = pygame.mouse.get_pos()
-                    new_game_rect, load_game_rect, quit_rect = self.show_menu()
-                    if self.show_input_box and self.input_box_rect.collidepoint(mouse_pos):
-                        self.input_active = True
                     elif new_game_rect.collidepoint(mouse_pos):
                         self.show_input_box = True
                         self.input_active = True
@@ -147,8 +225,8 @@ class GameMainUI(BaseUI):
             self.game_manager = GameManager()
             self.game_manager.start_new_game(character_name)
         self.next_ui = None
-        self.save_popup = False
-        self.result_popup = False
+        self.save_popup = None  # BannerPopup对象
+        self.result_popup = None  # DialogPopup对象
         self.last_status = None
         self.last_result = None
 
@@ -204,11 +282,11 @@ class GameMainUI(BaseUI):
                 btn_y += 60
             save_rect = self.draw_button("保存游戏", 750, 30, 120, 40, (0, 255, 0))
             choice_rects.append(save_rect)
+        # 弹窗显示
         if self.save_popup:
-            self.draw_popup("保存成功！")
-            self.save_popup = False
-        if self.result_popup and self.last_result:
-            btn_rect = self.draw_popup(self.last_result, color=(255, 255, 0))
+            self.save_popup.draw()
+        if self.result_popup:
+            btn_rect = self.result_popup.draw()
             return [btn_rect]
         pygame.display.flip()
         return choice_rects
@@ -229,12 +307,12 @@ class GameMainUI(BaseUI):
                             pygame.quit()
                             sys.exit()
                     continue
-                if self.result_popup and self.last_result:
+                if self.result_popup:
                     if event.type == pygame.MOUSEBUTTONDOWN:
                         mouse_pos = pygame.mouse.get_pos()
-                        btn_rect = self.show_game()[0]
-                        if btn_rect.collidepoint(mouse_pos):
-                            self.result_popup = False
+                        btn_rect = self.result_popup.draw()
+                        if btn_rect and btn_rect.collidepoint(mouse_pos):
+                            self.result_popup = None
                             self.last_result = None
                     continue
                 if event.type == pygame.MOUSEBUTTONDOWN:
@@ -246,7 +324,7 @@ class GameMainUI(BaseUI):
                             if i == len(choice_rects) - 1:
                                 info("[GameMainUI] Save game pressed")
                                 self.game_manager.save_game()
-                                self.save_popup = True
+                                self.save_popup = BannerPopup(self, "保存成功！", color=(0,255,0), top=False, duration=1.5)
                             else:
                                 info(f"[GameMainUI] Choice {i} pressed")
                                 # 记录选择前的属性
@@ -277,7 +355,10 @@ class GameMainUI(BaseUI):
                                         changes.append(f"经验: {self.last_status['experience']} → {new_status['experience']}")
                                 result_text = f"{desc}\n" + ("\n".join(changes) if changes else "无属性变化")
                                 self.last_result = result_text
-                                self.result_popup = True
+                                self.result_popup = DialogPopup(self, self.last_result, color=(255,255,0), top=False)
+            # 自动关闭BannerPopup
+            if self.save_popup and self.save_popup.expired():
+                self.save_popup = None
             self.show_game()
             self.clock.tick(60)
 

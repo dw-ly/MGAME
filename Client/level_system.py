@@ -2,40 +2,31 @@
 Author: SunHebin dwlyshb@163.com
 Date: 2025-04-27 09:49:45
 LastEditors: SunHebin dwlyshb@163.com
-LastEditTime: 2025-04-27 09:56:46
+LastEditTime: 2025-04-27 10:28:46
 FilePath: \MGAME\Client\level_system.py
 Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
 '''
 import json
 import os
+from common.config_loader import ConfigLoader
 
 class LevelSystem:
     def __init__(self):
         self.level = 1
         self.experience = 0
-        self.load_level_config()
-
-    def load_level_config(self):
-        """加载等级配置"""
-        config_path = os.path.join(os.path.dirname(__file__), 'config', 'level_config.json')
-        try:
-            with open(config_path, 'r', encoding='utf-8') as f:
-                self.level_config = json.load(f)
-        except Exception as e:
-            print(f"加载等级配置失败: {e}")
-            # 设置默认配置
-            self.level_config = {
-                "level_requirements": {"1": 100},
-                "level_up_attributes": {
-                    "1": {
-                        "strength": 2,
-                        "intelligence": 2,
-                        "charm": 2,
-                        "health": 10,
-                        "money": 500
-                    }
+        self.config_loader = ConfigLoader('level_config', {
+            "level_requirements": {"1": 50},
+            "level_up_attributes": {
+                "1": {
+                    "strength": 1,
+                    "intelligence": 1,
+                    "charm": 1,
+                    "health": 5,
+                    "money": 200
                 }
             }
+        })
+        self.level_config = self.config_loader.load()
 
     def gain_experience(self, amount):
         """获得经验值"""

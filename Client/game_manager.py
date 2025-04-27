@@ -14,7 +14,6 @@ class GameManager:
         self.day = 1
         self.max_days = 30
         self.save_file = 'save.json'
-        self.load_events()
         info(f"[GameManager] events loaded: {list(self.event_manager.events.keys())}")
 
     def load_events(self, events_file=None):
@@ -60,13 +59,13 @@ class GameManager:
             error(f"加载事件数据失败: {e}")
 
     def start_new_game(self, character_name):
-        info(f"[GameManager] start_new_game called with name: {character_name}")
+        """开始新游戏"""
+        info(f"[GameManager] start_new_game with character_name: {character_name}")
         self.character = Character(character_name)
-        info(f"[GameManager] character created: {self.character.name}")
-        self.event_manager.set_current_event('start')
-        info(f"[GameManager] set_current_event('start'), current_event: {self.event_manager.current_event}")
         self.game_state = 'playing'
         self.day = 1
+        self.event_manager.set_current_event('start')
+        return True
 
     def load_game(self, save_file=None):
         """加载游戏"""
