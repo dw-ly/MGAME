@@ -155,10 +155,12 @@ class GameManager:
         """获取角色状态"""
         if not self.character:
             return None
+        exp_info = self.character.get_exp_info()
         return {
             'name': self.character.name,
             'attributes': self.character.attributes,
-            'level': self.character.level,
-            'experience': self.character.experience,
+            'level': exp_info['level'],
+            'experience': exp_info['current_exp'],
+            'required_exp': exp_info['required_exp'],
             'day': self.day
         } 

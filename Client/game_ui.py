@@ -184,7 +184,7 @@ class GameMainUI(BaseUI):
             y += 30
             self.draw_text(f"等级: {status['level']}", 30, y)
             y += 30
-            self.draw_text(f"经验: {status['experience']}", 30, y)
+            self.draw_text(f"经验: {status['experience']}/{status['required_exp']}", 30, y)
             y += 30
             self.draw_text(f"天数: {status['day']}/30", 30, y)
             y += 30
@@ -260,15 +260,21 @@ class GameMainUI(BaseUI):
                                 # 生成属性变化描述
                                 changes = []
                                 if self.last_status and new_status:
+                                    # 检查等级变化
+                                    if self.last_status['level'] != new_status['level']:
+                                        level_change = f"等级提升: {self.last_status['level']} → {new_status['level']}"
+                                        changes.append(level_change)
+                                        # 添加属性提升信息
+                                        changes.append("属性提升：")
+                                    # 检查属性变化
                                     for attr in self.last_status['attributes']:
                                         before = self.last_status['attributes'][attr]
                                         after = new_status['attributes'][attr]
                                         if before != after:
                                             changes.append(f"{attr}: {before} → {after}")
+                                    # 检查经验值变化
                                     if self.last_status['experience'] != new_status['experience']:
                                         changes.append(f"经验: {self.last_status['experience']} → {new_status['experience']}")
-                                    if self.last_status['level'] != new_status['level']:
-                                        changes.append(f"等级: {self.last_status['level']} → {new_status['level']}")
                                 result_text = f"{desc}\n" + ("\n".join(changes) if changes else "无属性变化")
                                 self.last_result = result_text
                                 self.result_popup = True
