@@ -13,6 +13,7 @@ import time
 from game_manager import GameManager
 from common.logger import info, no_print
 from common.resource_loader import ResourceLoader
+from common.version_manager import version_manager
 from UI.popup import DialogPopup, BannerPopup
 from UI.input_box import InputBox
 from UI.button import StartButton
@@ -23,17 +24,32 @@ class BaseUI:
         self.screen = pygame.display.set_mode((width, height))
         pygame.display.set_caption(title)
         self.clock = pygame.time.Clock()
+        self.width = width
+        self.height = height
         
         # 加载字体
         try:
             font_path = ResourceLoader.load_font("SIMHEI.TTF", 24)
             if font_path:
                 self.font = pygame.font.Font(font_path, 24)
+                # 为版本号创建一个小号字体
+                self.small_font = pygame.font.Font(font_path, 16)
             else:
                 self.font = pygame.font.Font(None, 24)
+                self.small_font = pygame.font.Font(None, 16)
         except Exception as e:
             info(f"加载字体失败: {e}")
             self.font = pygame.font.Font(None, 24)
+            self.small_font = pygame.font.Font(None, 16)
+
+    def draw_version(self):
+        """在左下角绘制版本信息"""
+        version_text = f"v{version_manager.current_version}"
+        text_surface = self.small_font.render(version_text, True, (128, 128, 128))  # 使用灰色
+        text_rect = text_surface.get_rect()
+        # 设置位置在左下角，留出一些边距
+        text_rect.bottomleft = (10, self.height - 10)
+        self.screen.blit(text_surface, text_rect)
 
     def draw_text(self, text, x, y, color=(255, 255, 255)):
         text_surface = self.font.render(text, True, color)
@@ -159,6 +175,10 @@ class MainMenuUI(BaseUI):
             tip_surface = self.font.render(tip, True, (255, 200, 100))
             tip_rect = tip_surface.get_rect(center=(self.screen.get_width() // 2, self.input_box.rect.y + self.input_box.rect.height + 20))
             self.screen.blit(tip_surface, tip_rect)
+        
+        # 在最后绘制版本信息
+        self.draw_version()
+        
         pygame.display.flip()
         return new_game_rect, load_game_rect, quit_rect
 
@@ -244,6 +264,10 @@ class GameMainUI(BaseUI):
                     self.draw_text(f"{attr}: {value}", 30, y)
                     y += 30
             quit_rect = self.draw_button("退出", 350, y + 60, 200, 50, (255, 255, 255))
+            
+            # 在最后绘制版本信息
+            self.draw_version()
+            
             pygame.display.flip()
             return [quit_rect]
         no_print("[GameMainUI] show_game called")
@@ -276,6 +300,10 @@ class GameMainUI(BaseUI):
                 btn_y += 60
             save_rect = self.draw_button("保存游戏", 750, 30, 120, 40, (0, 255, 0))
             choice_rects.append(save_rect)
+            
+        # 在最后绘制版本信息
+        self.draw_version()
+            
         # 弹窗显示
         if self.save_popup:
             self.save_popup.draw()

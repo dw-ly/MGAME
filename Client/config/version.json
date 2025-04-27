@@ -1,0 +1,18 @@
+{
+    "version": {
+        "major": 1,
+        "minor": 0,
+        "patch": 0,
+        "build": "20240327",
+        "description": "第一个正式版本"
+    },
+    "compatibility": {
+        "min_version": "1.0.0",
+        "max_version": "1.9.9"
+    },
+    "update": {
+        "check_url": "",
+        "auto_check": true,
+        "check_interval": 86400
+    }
+} 
