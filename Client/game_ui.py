@@ -4,7 +4,9 @@ import os
 import time
 from game_manager import GameManager
 from common.logger import info, no_print
-from popup import DialogPopup, BannerPopup
+from UI.popup import DialogPopup, BannerPopup
+from UI.input_box import InputBox
+from UI.button import StartButton
 
 class BaseUI:
     def __init__(self, width=900, height=700, title="文字选择养成游戏"):
@@ -120,7 +122,17 @@ class MainMenuUI(BaseUI):
         super().__init__(width=900, height=700)
         self.input_text = ""
         self.input_active = False
-        self.input_box_rect = pygame.Rect(250, 570, 400, 40)
+        # 输入框和按钮参数
+        input_box_width = 300
+        input_box_height = 40
+        start_btn_width = 80
+        gap = 20
+        total_width = input_box_width + gap + start_btn_width
+        center_x = self.screen.get_width() // 2
+        input_box_x = center_x - total_width // 2
+        input_box_y = 570
+        self.input_box = InputBox(input_box_x, input_box_y, input_box_width, input_box_height, self.font, max_length=12)
+        self.start_btn = StartButton(input_box_x + input_box_width + gap, input_box_y, start_btn_width, input_box_height, self.font)
         self.show_input_box = False
         self.game_manager = GameManager()
         self.next_ui = None
@@ -131,78 +143,53 @@ class MainMenuUI(BaseUI):
         new_game_rect = self.draw_button("新游戏", 350, 240, 200, 50, (255, 255, 255))
         load_game_rect = self.draw_button("加载游戏", 350, 320, 200, 50, (255, 255, 255))
         quit_rect = self.draw_button("退出", 350, 400, 200, 50, (255, 255, 255))
-        start_btn_rect = None
         if self.show_input_box:
             self.draw_text("请输入角色名称：", 320, 500)
-            # 输入框和按钮整体居中
-            input_box_width = 300
-            input_box_height = 40
-            start_btn_width = 80
-            gap = 20
-            total_width = input_box_width + gap + start_btn_width
-            center_x = self.screen.get_width() // 2
-            input_box_x = center_x - total_width // 2
-            input_box_y = 570
-            self.input_box_rect = pygame.Rect(input_box_x, input_box_y, input_box_width, input_box_height)
-            # 输入框高亮
-            border_color = (255, 255, 0) if self.input_active else (255, 255, 255)
-            pygame.draw.rect(self.screen, border_color, self.input_box_rect, 3 if self.input_active else 2)
-            input_surface = self.font.render(self.input_text, True, (255, 255, 255))
-            self.screen.blit(input_surface, (self.input_box_rect.x + 10, self.input_box_rect.y + 5))
-            # 开始按钮
-            start_btn_rect = pygame.Rect(self.input_box_rect.right + gap, input_box_y, start_btn_width, input_box_height)
-            pygame.draw.rect(self.screen, (255, 255, 255), start_btn_rect)
-            btn_text = self.font.render("开始", True, (0, 0, 0))
-            btn_text_rect = btn_text.get_rect(center=start_btn_rect.center)
-            self.screen.blit(btn_text, btn_text_rect)
-            # 输入法提示
+            self.input_box.draw(self.screen)
+            self.start_btn.draw(self.screen)
             tip = "* 建议切换为英文输入法，否则部分输入法无法输入 *"
             tip_surface = self.font.render(tip, True, (255, 200, 100))
-            tip_rect = tip_surface.get_rect(center=(self.screen.get_width() // 2, self.input_box_rect.y + self.input_box_rect.height + 20))
+            tip_rect = tip_surface.get_rect(center=(self.screen.get_width() // 2, self.input_box.rect.y + self.input_box.rect.height + 20))
             self.screen.blit(tip_surface, tip_rect)
         pygame.display.flip()
-        return new_game_rect, load_game_rect, quit_rect, start_btn_rect
+        return new_game_rect, load_game_rect, quit_rect
 
     def run(self):
         info("[MainMenuUI] run() called")
         while True:
+            new_game_rect, load_game_rect, quit_rect = self.show_menu()
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     info("[MainMenuUI] Quit event")
                     pygame.quit()
                     sys.exit()
-                if self.input_active:
-                    if event.type == pygame.KEYDOWN:
-                        if event.key == pygame.K_RETURN:
-                            if self.input_text.strip():
-                                info(f"[MainMenuUI] Switching to GameMainUI with name: {self.input_text.strip()}")
-                                self.next_ui = GameMainUI(self.input_text.strip())
-                                return
-                            else:
-                                self.input_text = ""
-                        elif event.key == pygame.K_BACKSPACE:
-                            self.input_text = self.input_text[:-1]
-                    elif event.type == pygame.TEXTINPUT:
-                        # 支持中文输入
-                        if len(self.input_text) < 12:
-                            self.input_text += event.text
-                    continue
-                if event.type == pygame.MOUSEBUTTONDOWN:
-                    mouse_pos = pygame.mouse.get_pos()
-                    new_game_rect, load_game_rect, quit_rect, start_btn_rect = self.show_menu()
-                    if self.show_input_box and self.input_box_rect.collidepoint(mouse_pos):
-                        self.input_active = True
-                    elif self.show_input_box and start_btn_rect and start_btn_rect.collidepoint(mouse_pos):
-                        if self.input_text.strip():
-                            info(f"[MainMenuUI] Switching to GameMainUI with name: {self.input_text.strip()}")
-                            self.next_ui = GameMainUI(self.input_text.strip())
+                if self.show_input_box:
+                    result = self.input_box.handle_event(event)
+                    if result == 'enter':
+                        if self.input_box.get_value().strip():
+                            info(f"[MainMenuUI] Switching to GameMainUI with name: {self.input_box.get_value().strip()}")
+                            self.next_ui = GameMainUI(self.input_box.get_value().strip())
                             return
                         else:
-                            self.input_text = ""
-                    elif new_game_rect.collidepoint(mouse_pos):
+                            self.input_box.set_value("")
+                    if event.type == pygame.MOUSEBUTTONDOWN:
+                        mouse_pos = pygame.mouse.get_pos()
+                        if self.input_box.collidepoint(mouse_pos):
+                            self.input_box.set_active(True)
+                        elif self.start_btn.collidepoint(mouse_pos):
+                            if self.input_box.get_value().strip():
+                                info(f"[MainMenuUI] Switching to GameMainUI with name: {self.input_box.get_value().strip()}")
+                                self.next_ui = GameMainUI(self.input_box.get_value().strip())
+                                return
+                            else:
+                                self.input_box.set_value("")
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    mouse_pos = pygame.mouse.get_pos()
+                    if new_game_rect.collidepoint(mouse_pos):
                         self.show_input_box = True
-                        self.input_active = True
-                        self.input_text = ""
+                        self.input_box.set_active(True)
+                        self.input_box.set_value("")
+                        continue
                     elif load_game_rect.collidepoint(mouse_pos):
                         if self.game_manager.load_game():
                             info(f"[MainMenuUI] Switching to GameMainUI with loaded name: {self.game_manager.character.name}")
@@ -212,7 +199,6 @@ class MainMenuUI(BaseUI):
                         info("[MainMenuUI] Quit button pressed")
                         pygame.quit()
                         sys.exit()
-            self.show_menu()
             self.clock.tick(60)
 
 class GameMainUI(BaseUI):

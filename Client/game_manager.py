@@ -4,6 +4,7 @@ from character import Character
 from event import Event, EventManager
 from common.logger import info, error
 import random
+from common.save_manager import SaveManager
 
 class GameManager:
     def __init__(self):
@@ -13,7 +14,7 @@ class GameManager:
         self.game_state = 'menu'  # menu, playing, paused, game_over
         self.day = 1
         self.max_days = 30
-        self.save_file = 'save.json'
+        self.save_manager = SaveManager('save', default_save={})
         info(f"[GameManager] events loaded: {list(self.event_manager.events.keys())}")
 
     def load_events(self, events_file=None):
@@ -69,26 +70,20 @@ class GameManager:
 
     def load_game(self, save_file=None):
         """加载游戏"""
-        if save_file:
-            self.save_file = save_file
-            
-        if not os.path.exists(self.save_file):
+        save_data = self.save_manager.load()
+        if not save_data or 'character' not in save_data:
             print("没有找到存档文件，开始新游戏")
             return False
-            
         try:
-            with open(self.save_file, 'r') as f:
-                save_data = json.load(f)
-            
-            self.character = Character(save_data['character']['name'])
-            self.character.attributes = save_data['character']['attributes']
-            self.character.inventory = save_data['character']['inventory']
-            self.character.relationships = save_data['character']['relationships']
-            self.character.experience = save_data['character']['experience']
-            self.character.level = save_data['character']['level']
-            
-            self.day = save_data['day']
-            self.event_manager.set_current_event(save_data['current_event'])
+            char_data = save_data['character']
+            self.character = Character(char_data['name'])
+            self.character.attributes = char_data['attributes']
+            self.character.inventory = char_data['inventory']
+            self.character.relationships = char_data['relationships']
+            self.character.level_system.level = char_data.get('level', 1)
+            self.character.level_system.experience = char_data.get('experience', 0)
+            self.day = save_data.get('day', 1)
+            self.event_manager.set_current_event(save_data.get('current_event', 'start'))
             self.game_state = 'playing'
             print("游戏加载成功！")
             return True
@@ -98,34 +93,22 @@ class GameManager:
 
     def save_game(self, save_file=None):
         """保存游戏"""
-        if save_file:
-            self.save_file = save_file
-            
         if not self.character:
-            print("没有可保存的游戏数据")
+            print("没有角色，无法保存")
             return False
-            
-        try:
-            save_data = {
-                'character': {
-                    'name': self.character.name,
-                    'attributes': self.character.attributes,
-                    'inventory': self.character.inventory,
-                    'relationships': self.character.relationships,
-                    'experience': self.character.experience,
-                    'level': self.character.level
-                },
-                'day': self.day,
-                'current_event': self.event_manager.current_event.event_id if self.event_manager.current_event else None
-            }
-            
-            with open(self.save_file, 'w') as f:
-                json.dump(save_data, f, indent=4)
-            print("游戏保存成功！")
-            return True
-        except Exception as e:
-            print(f"保存游戏失败: {e}")
-            return False
+        save_data = {
+            'character': {
+                'name': self.character.name,
+                'attributes': self.character.attributes,
+                'inventory': self.character.inventory,
+                'relationships': self.character.relationships,
+                'level': self.character.level_system.level,
+                'experience': self.character.level_system.experience
+            },
+            'day': self.day,
+            'current_event': self.event_manager.current_event.event_id if self.event_manager.current_event else None
+        }
+        return self.save_manager.save(save_data)
 
     def process_choice(self, choice_index):
         """处理玩家选择，返回desc"""

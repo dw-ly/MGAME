@@ -1,3 +1,11 @@
+<!--
+ * @Author: SunHebin dwlyshb@163.com
+ * @Date: 2025-04-27 09:08:36
+ * @LastEditors: SunHebin dwlyshb@163.com
+ * @LastEditTime: 2025-04-27 09:40:51
+ * @FilePath: \MGAME\README.md
+ * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
+-->
 # 文字选择养成游戏
 
 这是一个基于Python和Pygame的文字选择养成类游戏框架。玩家可以通过不同的选择来培养角色，影响角色的属性和故事发展。
