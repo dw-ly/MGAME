@@ -3,267 +3,193 @@
         "event_id": "start",
         "description": "欢迎来到文字选择养成游戏！今天是你的第一天，你决定...",
         "choices": [
-            {
-                "text": "去图书馆学习",
-                "results": [
-                    {"desc": "你在图书馆学到了新知识。", "effects": {"intelligence": 2, "experience": 50}},
-                    {"desc": "你在图书馆遇到了一位老师，获得额外经验。", "effects": {"intelligence": 2, "experience": 80}}
-                ],
-                "next_event": "library"
-            },
-            {
-                "text": "去健身房锻炼",
-                "results": [
-                    {"desc": "你锻炼得很努力，体力提升。", "effects": {"strength": 2, "experience": 50}},
-                    {"desc": "你锻炼时受了点小伤。", "effects": {"strength": 2, "health": -10, "experience": 30}}
-                ],
-                "next_event": "gym"
-            },
-            {
-                "text": "去参加社交活动",
-                "results": [
-                    {"desc": "你结识了新朋友，魅力提升。", "effects": {"charm": 2, "experience": 50}},
-                    {"desc": "你在活动中表现平平。", "effects": {"charm": 1, "experience": 20}}
-                ],
-                "next_event": "social"
-            }
+            {"text": "去图书馆学习", "results": [
+                {"desc": "你在图书馆学到了新知识。", "effects": {"intelligence": 2, "experience": 50}},
+                {"desc": "你在图书馆遇到了一位老师，获得额外经验。", "effects": {"intelligence": 2, "experience": 80}}
+            ], "next_event": "library"},
+            {"text": "去健身房锻炼", "results": [
+                {"desc": "你锻炼得很努力，体力提升。", "effects": {"strength": 2, "experience": 50}},
+                {"desc": "你锻炼时受了点小伤。", "effects": {"strength": 2, "health": -10, "experience": 30}}
+            ], "next_event": "gym"},
+            {"text": "去参加社交活动", "results": [
+                {"desc": "你结识了新朋友，魅力提升。", "effects": {"charm": 2, "experience": 50}},
+                {"desc": "你在活动中表现平平。", "effects": {"charm": 1, "experience": 20}}
+            ], "next_event": "social"}
         ]
     },
     "library": {
         "event_id": "library",
         "description": "你在图书馆认真学习，突然遇到一个难题...",
         "choices": [
-            {
-                "text": "自己研究解决",
-                "results": [
-                    {"desc": "你独立解决了难题，智力大增。", "effects": {"intelligence": 3, "experience": 100}},
-                    {"desc": "你花了很久才解决难题。", "effects": {"intelligence": 1, "experience": 50}}
-                ],
-                "next_event": "study"
-            },
-            {
-                "text": "请教同学",
-                "results": [
-                    {"desc": "同学热心帮助你，魅力提升。", "effects": {"charm": 1, "experience": 50}},
-                    {"desc": "同学也不会，大家一起查资料。", "effects": {"intelligence": 1, "experience": 30}}
-                ],
-                "next_event": "ask_help"
-            }
+            {"text": "自己研究解决", "results": [
+                {"desc": "你独立解决了难题，智力大增。", "effects": {"intelligence": 3, "experience": 100}},
+                {"desc": "你花了很久才解决难题。", "effects": {"intelligence": 1, "experience": 50}}
+            ], "next_event": "study"},
+            {"text": "请教同学", "results": [
+                {"desc": "同学热心帮助你，魅力提升。", "effects": {"charm": 1, "experience": 50}},
+                {"desc": "同学也不会，大家一起查资料。", "effects": {"intelligence": 1, "experience": 30}}
+            ], "next_event": "ask_help"}
         ]
     },
     "gym": {
         "event_id": "gym",
         "description": "你在健身房锻炼时，遇到一个挑战...",
         "choices": [
-            {
-                "text": "尝试举重",
-                "results": [
-                    {"desc": "你成功举起了更重的杠铃！", "effects": {"strength": 3, "experience": 100}},
-                    {"desc": "你有些吃力，健康略有下降。", "effects": {"strength": 2, "health": -10, "experience": 50}}
-                ],
-                "next_event": "weight_lifting"
-            },
-            {
-                "text": "做有氧运动",
-                "results": [
-                    {"desc": "有氧运动让你精神焕发。", "effects": {"health": 20, "experience": 50}},
-                    {"desc": "你觉得有点累，但还是坚持下来了。", "effects": {"health": 10, "experience": 30}}
-                ],
-                "next_event": "cardio"
-            }
+            {"text": "尝试举重", "results": [
+                {"desc": "你成功举起了更重的杠铃！", "effects": {"strength": 3, "experience": 100}},
+                {"desc": "你有些吃力，健康略有下降。", "effects": {"strength": 2, "health": -10, "experience": 50}}
+            ], "next_event": "weight_lifting"},
+            {"text": "做有氧运动", "results": [
+                {"desc": "有氧运动让你精神焕发。", "effects": {"health": 20, "experience": 50}},
+                {"desc": "你觉得有点累，但还是坚持下来了。", "effects": {"health": 10, "experience": 30}}
+            ], "next_event": "cardio"}
+        ]
+    },
+    "weight_lifting": {
+        "event_id": "weight_lifting",
+        "description": "你在举重区遇到一位健身达人，他邀请你一起训练。你会：",
+        "choices": [
+            {"text": "接受邀请，学习技巧", "results": [
+                {"desc": "你学到了新技巧，力量提升。", "effects": {"strength": 2, "experience": 30}},
+                {"desc": "你训练过度，体力消耗。", "effects": {"strength": 1, "health": -10, "experience": 20}}
+            ], "next_event": "gym_friend"},
+            {"text": "婉拒，自己锻炼", "results": [
+                {"desc": "你专注锻炼，效果不错。", "effects": {"strength": 1, "experience": 20}}
+            ], "next_event": "gym"}
+        ]
+    },
+    "gym_friend": {
+        "event_id": "gym_friend",
+        "description": "健身达人给了你一些建议，并送你一瓶能量饮料。你获得了物品：能量饮料。",
+        "choices": [
+            {"text": "感谢并饮用能量饮料", "results": [
+                {"desc": "你感觉精力充沛！", "effects": {"health": 20, "experience": 10}}
+            ], "next_event": "gym"},
+            {"text": "收下饮料，留待以后使用", "results": [
+                {"desc": "你将能量饮料放入背包。", "effects": {}}
+            ], "next_event": "gym"}
+        ]
+    },
+    "study": {
+        "event_id": "study",
+        "description": "你在自习室遇到一场小测验。你会：",
+        "choices": [
+            {"text": "认真答题", "results": [
+                {"desc": "你答对了大部分题目，智力提升。", "effects": {"intelligence": 2, "experience": 30}}
+            ], "next_event": "library"},
+            {"text": "随便写写", "results": [
+                {"desc": "成绩一般。", "effects": {"experience": 10}}
+            ], "next_event": "library"}
+        ]
+    },
+    "ask_help": {
+        "event_id": "ask_help",
+        "description": "同学们讨论后决定组队学习。你会：",
+        "choices": [
+            {"text": "积极参与讨论", "results": [
+                {"desc": "你收获了友谊和知识。", "effects": {"charm": 1, "intelligence": 1, "experience": 20}}
+            ], "next_event": "library"},
+            {"text": "默默听讲", "results": [
+                {"desc": "你学到了一些新知识。", "effects": {"intelligence": 1, "experience": 10}}
+            ], "next_event": "library"}
+        ]
+    },
+    "cardio": {
+        "event_id": "cardio",
+        "description": "你在跑步机上遇到一位教练，他建议你调整训练计划。你会：",
+        "choices": [
+            {"text": "听从建议，调整计划", "results": [
+                {"desc": "训练更科学，健康提升。", "effects": {"health": 10, "experience": 10}}
+            ], "next_event": "gym"},
+            {"text": "坚持原计划", "results": [
+                {"desc": "你坚持自我，略感疲惫。", "effects": {"health": -5, "experience": 5}}
+            ], "next_event": "gym"}
+        ]
+    },
+    "social": {
+        "event_id": "social",
+        "description": "你在社交活动中遇到一位有趣的人。你会：",
+        "choices": [
+            {"text": "主动搭讪", "results": [
+                {"desc": "你们聊得很开心，魅力提升。", "effects": {"charm": 2, "experience": 20}}
+            ], "next_event": "friendship"},
+            {"text": "保持距离", "results": [
+                {"desc": "你选择观察，收获不大。", "effects": {"experience": 5}}
+            ], "next_event": "social"}
+        ]
+    },
+    "friendship": {
+        "event_id": "friendship",
+        "description": "你们成为了朋友，对方邀请你参加一个聚会。你会：",
+        "choices": [
+            {"text": "答应参加聚会", "results": [
+                {"desc": "聚会很有趣，结识了更多朋友。", "effects": {"charm": 2, "experience": 20}}
+            ], "next_event": "social"},
+            {"text": "婉拒邀请", "results": [
+                {"desc": "你选择休息，恢复精力。", "effects": {"health": 10}}
+            ], "next_event": "social"}
         ]
     },
     "events": [
-        {
-            "id": 1,
-            "description": "你遇到了一位神秘的老人，他给了你一个选择：",
-            "choices": [
-                {
-                    "text": "接受他的建议，学习一些技能",
-                    "effects": {
-                        "intelligence": 2,
-                        "experience": 10
-                    }
-                },
-                {
-                    "text": "拒绝他的建议，继续前行",
-                    "effects": {
-                        "health": -5
-                    }
-                }
-            ]
-        },
-        {
-            "id": 2,
-            "description": "你在森林中发现了一只受伤的小动物，你会：",
-            "choices": [
-                {
-                    "text": "帮助它，照顾它",
-                    "effects": {
-                        "charm": 2,
-                        "health": -5
-                    }
-                },
-                {
-                    "text": "忽略它，继续前行",
-                    "effects": {
-                        "experience": 5
-                    }
-                }
-            ]
-        },
-        {
-            "id": 3,
-            "description": "你遇到了一群强盗，他们要求你交出财物，你会：",
-            "choices": [
-                {
-                    "text": "与他们战斗",
-                    "effects": {
-                        "strength": 2,
-                        "health": -10
-                    }
-                },
-                {
-                    "text": "交出财物，保命要紧",
-                    "effects": {
-                        "money": -100
-                    }
-                }
-            ]
-        },
-        {
-            "id": 4,
-            "description": "你在市场上发现了一件稀有的物品，你会：",
-            "choices": [
-                {
-                    "text": "购买它，可能有用",
-                    "effects": {
-                        "money": -50,
-                        "experience": 5
-                    }
-                },
-                {
-                    "text": "不买，继续寻找其他物品",
-                    "effects": {
-                        "experience": 2
-                    }
-                }
-            ]
-        },
-        {
-            "id": 5,
-            "description": "你遇到了一位旅行者，他邀请你一起旅行，你会：",
-            "choices": [
-                {
-                    "text": "接受邀请，一起旅行",
-                    "effects": {
-                        "charm": 2,
-                        "experience": 10
-                    }
-                },
-                {
-                    "text": "拒绝邀请，独自前行",
-                    "effects": {
-                        "experience": 5
-                    }
-                }
-            ]
-        },
-        {
-            "id": 6,
-            "description": "你在旅途中遇到了一场暴风雨，你会：",
-            "choices": [
-                {
-                    "text": "寻找避雨的地方",
-                    "effects": {
-                        "health": -5,
-                        "experience": 5
-                    }
-                },
-                {
-                    "text": "继续前行，不顾风雨",
-                    "effects": {
-                        "health": -10,
-                        "strength": 2
-                    }
-                }
-            ]
-        },
-        {
-            "id": 7,
-            "description": "你发现了一个神秘的洞穴，你会：",
-            "choices": [
-                {
-                    "text": "探索洞穴",
-                    "effects": {
-                        "experience": 15,
-                        "health": -5
-                    }
-                },
-                {
-                    "text": "绕过洞穴，继续前行",
-                    "effects": {
-                        "experience": 5
-                    }
-                }
-            ]
-        },
-        {
-            "id": 8,
-            "description": "你在旅途中遇到了一位商人，他有一些稀有的物品，你会：",
-            "choices": [
-                {
-                    "text": "购买一些物品",
-                    "effects": {
-                        "money": -100,
-                        "experience": 10
-                    }
-                },
-                {
-                    "text": "不买，继续前行",
-                    "effects": {
-                        "experience": 5
-                    }
-                }
-            ]
-        },
-        {
-            "id": 9,
-            "description": "你遇到了一位受伤的战士，你会：",
-            "choices": [
-                {
-                    "text": "帮助他，照顾他",
-                    "effects": {
-                        "charm": 2,
-                        "health": -5
-                    }
-                },
-                {
-                    "text": "忽略他，继续前行",
-                    "effects": {
-                        "experience": 5
-                    }
-                }
-            ]
-        },
-        {
-            "id": 10,
-            "description": "你在旅途中遇到了一场战斗，你会：",
-            "choices": [
-                {
-                    "text": "参与战斗",
-                    "effects": {
-                        "strength": 2,
-                        "health": -10
-                    }
-                },
-                {
-                    "text": "避开战斗，继续前行",
-                    "effects": {
-                        "experience": 5
-                    }
-                }
-            ]
-        }
+        {"id": 1, "description": "你遇到了一位神秘的老人，他给了你一个选择：", "choices": [
+            {"text": "接受他的建议，学习一些技能", "effects": {"intelligence": 2, "experience": 10}},
+            {"text": "拒绝他的建议，继续前行", "effects": {"health": -5}}
+        ]},
+        {"id": 2, "description": "你在森林中发现了一只受伤的小动物，你会：", "choices": [
+            {"text": "帮助它，照顾它", "effects": {"charm": 2, "health": -5}},
+            {"text": "忽略它，继续前行", "effects": {"experience": 5}}
+        ]},
+        {"id": 3, "description": "你遇到了一群强盗，他们要求你交出财物，你会：", "choices": [
+            {"text": "与他们战斗", "effects": {"strength": 2, "health": -10}},
+            {"text": "交出财物，保命要紧", "effects": {"money": -100}}
+        ]},
+        {"id": 4, "description": "你在市场上发现了一件稀有的物品，你会：", "choices": [
+            {"text": "购买它，可能有用", "effects": {"money": -50, "experience": 5}},
+            {"text": "不买，继续寻找其他物品", "effects": {"experience": 2}}
+        ]},
+        {"id": 5, "description": "你遇到了一位旅行者，他邀请你一起旅行，你会：", "choices": [
+            {"text": "接受邀请，一起旅行", "effects": {"charm": 2, "experience": 10}},
+            {"text": "拒绝邀请，独自前行", "effects": {"experience": 5}}
+        ]},
+        {"id": 6, "description": "你在旅途中遇到了一场暴风雨，你会：", "choices": [
+            {"text": "寻找避雨的地方", "effects": {"health": -5, "experience": 5}},
+            {"text": "继续前行，不顾风雨", "effects": {"health": -10, "strength": 2}}
+        ]},
+        {"id": 7, "description": "你发现了一个神秘的洞穴，你会：", "choices": [
+            {"text": "探索洞穴", "effects": {"experience": 15, "health": -5}},
+            {"text": "绕过洞穴，继续前行", "effects": {"experience": 5}}
+        ]},
+        {"id": 8, "description": "你在旅途中遇到一位商人，他有一些稀有的物品，你会：", "choices": [
+            {"text": "购买一些物品", "effects": {"money": -100, "experience": 10}},
+            {"text": "不买，继续前行", "effects": {"experience": 5}}
+        ]},
+        {"id": 9, "description": "你遇到了一位受伤的战士，你会：", "choices": [
+            {"text": "帮助他，照顾他", "effects": {"charm": 2, "health": -5}},
+            {"text": "忽略他，继续前行", "effects": {"experience": 5}}
+        ]},
+        {"id": 10, "description": "你在湖边发现一艘小船，你会：", "choices": [
+            {"text": "划船到湖中心探险", "effects": {"experience": 10, "health": -5}},
+            {"text": "在岸边休息", "effects": {"health": 10}}
+        ]},
+        {"id": 11, "description": "你在山路上遇到一只野狼，你会：", "choices": [
+            {"text": "勇敢对抗", "effects": {"strength": 2, "health": -10}},
+            {"text": "躲避野狼", "effects": {"experience": 5}}
+        ]},
+        {"id": 12, "description": "你在村庄里参加了一个节日活动，你会：", "choices": [
+            {"text": "积极参与", "effects": {"charm": 2, "experience": 10}},
+            {"text": "安静旁观", "effects": {"experience": 5}}
+        ]},
+        {"id": 13, "description": "你在夜晚仰望星空，思考人生。你会：", "choices": [
+            {"text": "写下感悟", "effects": {"intelligence": 1, "charm": 1, "experience": 5}},
+            {"text": "静静欣赏", "effects": {"experience": 3}}
+        ]},
+        {"id": 14, "description": "你在路边捡到一只钱包，你会：", "choices": [
+            {"text": "归还失主", "effects": {"charm": 2, "money": 50}},
+            {"text": "自己留下", "effects": {"money": 100, "charm": -1}}
+        ]},
+        {"id": 15, "description": "你在山洞中发现一块神秘的石头，你会：", "choices": [
+            {"text": "带走石头", "effects": {"intelligence": 1, "experience": 5}},
+            {"text": "原地不动", "effects": {"experience": 2}}
+        ]}
     ]
 } 

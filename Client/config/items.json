@@ -1,0 +1,9 @@
+{
+  "items": [
+    {"id": "potion", "name": "治疗药水", "desc": "恢复20点健康。", "type": "consumable", "stackable": true},
+    {"id": "elixir", "name": "精力药剂", "desc": "恢复10点体力。", "type": "consumable", "stackable": true},
+    {"id": "sword", "name": "铁剑", "desc": "基础攻击装备。", "type": "equipment", "stackable": false},
+    {"id": "amulet", "name": "护身符", "desc": "据说能带来好运。", "type": "equipment", "stackable": false},
+    {"id": "quest_gem", "name": "神秘宝石", "desc": "任务道具，交给特定NPC。", "type": "quest", "stackable": false}
+  ]
+} 

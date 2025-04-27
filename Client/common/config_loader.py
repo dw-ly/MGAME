@@ -2,6 +2,7 @@ import json
 import os
 import sys
 from typing import Any, Dict, Optional
+from .logger import info
 
 class ConfigLoader:
     """通用配置文件加载器"""
@@ -24,19 +25,19 @@ class ConfigLoader:
         """
         paths = []
         
-        # 1. 当前工作目录下的config文件夹
+        # 1. 如果是打包后的可执行文件，从资源目录加载
+        if getattr(sys, 'frozen', False):
+            base_path = sys._MEIPASS
+            paths.append(os.path.join(base_path, 'config', f'{self.config_name}.json'))
+        
+        # 2. 当前工作目录下的config文件夹
         paths.append(os.path.join(os.getcwd(), 'config', f'{self.config_name}.json'))
         
-        # 2. 脚本所在目录下的config文件夹
-        if getattr(sys, 'frozen', False):
-            # 如果是打包后的可执行文件
-            base_path = os.path.dirname(sys.executable)
-        else:
-            # 如果是开发环境
-            base_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        # 3. 脚本所在目录下的config文件夹
+        base_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
         paths.append(os.path.join(base_path, 'config', f'{self.config_name}.json'))
         
-        # 3. 用户数据目录下的config文件夹
+        # 4. 用户数据目录下的config文件夹
         if sys.platform == 'win32':
             appdata = os.getenv('APPDATA')
             if appdata:
@@ -48,65 +49,65 @@ class ConfigLoader:
             home = os.path.expanduser('~')
             paths.append(os.path.join(home, '.config', 'MGAME', f'{self.config_name}.json'))
             
+        info(f"配置文件搜索路径: {paths}")
         return paths
-
+        
     def load(self) -> Dict[str, Any]:
         """
         加载配置文件
-        按优先级尝试从不同位置加载
-        :return: 配置数据
+        如果所有路径都找不到配置文件，则返回默认配置
         """
+        if self.config is not None:
+            return self.config
+            
         for path in self.config_paths:
-            try:
-                if os.path.exists(path):
+            if os.path.exists(path):
+                try:
                     with open(path, 'r', encoding='utf-8') as f:
                         self.config = json.load(f)
-                        return self.config
-            except Exception as e:
-                print(f"加载配置文件 {path} 失败: {e}")
-                continue
-                
-        # 如果所有路径都加载失败，使用默认配置
-        print(f"警告: 未能加载配置文件 {self.config_name}.json，使用默认配置")
-        self.config = self.default_config.copy()
-        return self.config
-
-    def save(self, config: Dict[str, Any] = None, path: Optional[str] = None) -> bool:
-        """
-        保存配置到文件
-        :param config: 要保存的配置数据，如果为None则保存当前配置
-        :param path: 保存路径，如果为None则使用第一个可用路径
-        :return: 是否保存成功
-        """
-        if config is not None:
-            self.config = config
-            
-        if self.config is None:
-            print("错误: 没有可保存的配置数据")
-            return False
-            
-        save_path = path
-        if save_path is None:
-            # 使用第一个可写的路径
-            for p in self.config_paths:
-                try:
-                    os.makedirs(os.path.dirname(p), exist_ok=True)
-                    save_path = p
-                    break
-                except Exception:
+                    info(f"成功加载配置文件: {path}")
+                    return self.config
+                except Exception as e:
+                    info(f"加载配置文件失败 {path}: {e}")
                     continue
                     
-        if save_path is None:
-            print("错误: 没有可用的保存路径")
-            return False
+        info(f"未找到配置文件，使用默认配置")
+        self.config = self.default_config.copy()
+        return self.config
+        
+    def save(self, config: Dict[str, Any]) -> bool:
+        """
+        保存配置到文件
+        优先保存到用户数据目录，如果失败则尝试保存到当前目录
+        """
+        self.config = config
+        
+        # 优先尝试保存到用户数据目录
+        save_paths = []
+        if sys.platform == 'win32':
+            appdata = os.getenv('APPDATA')
+            if appdata:
+                save_path = os.path.join(appdata, 'MGAME', 'config')
+                save_paths.append(save_path)
+                
+        # 如果不是打包环境，也可以保存到当前目录
+        if not getattr(sys, 'frozen', False):
+            save_paths.append(os.path.join(os.getcwd(), 'config'))
             
-        try:
-            with open(save_path, 'w', encoding='utf-8') as f:
-                json.dump(self.config, f, ensure_ascii=False, indent=4)
-            return True
-        except Exception as e:
-            print(f"保存配置文件失败: {e}")
-            return False
+        for save_path in save_paths:
+            try:
+                os.makedirs(save_path, exist_ok=True)
+                file_path = os.path.join(save_path, f'{self.config_name}.json')
+                with open(file_path, 'w', encoding='utf-8') as f:
+                    json.dump(self.config, f, ensure_ascii=False, indent=4)
+                info(f"成功保存配置文件: {file_path}")
+                return True
+            except Exception as e:
+                info(f"保存配置文件失败 {save_path}: {e}")
+                continue
+                
+        info("保存配置文件失败：所有路径都无法写入")
+        return False
 
     def get(self, key: str, default: Any = None) -> Any:
         """

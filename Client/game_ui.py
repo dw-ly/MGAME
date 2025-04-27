@@ -1,9 +1,18 @@
+'''
+Author: SunHebin dwlyshb@163.com
+Date: 2025-04-27 09:11:41
+LastEditors: SunHebin dwlyshb@163.com
+LastEditTime: 2025-04-27 15:18:48
+FilePath: \MGAME\Client\game_ui.py
+Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
+'''
 import pygame
 import sys
 import os
 import time
 from game_manager import GameManager
 from common.logger import info, no_print
+from common.resource_loader import ResourceLoader
 from UI.popup import DialogPopup, BannerPopup
 from UI.input_box import InputBox
 from UI.button import StartButton
@@ -14,17 +23,16 @@ class BaseUI:
         self.screen = pygame.display.set_mode((width, height))
         pygame.display.set_caption(title)
         self.clock = pygame.time.Clock()
-        font_path = None
-        for candidate in ["simhei.ttf", "msyh.ttc", "msyh.ttf"]:
-            if os.path.exists(candidate):
-                font_path = candidate
-                break
-        if font_path:
-            try:
+        
+        # 加载字体
+        try:
+            font_path = ResourceLoader.load_font("SIMHEI.TTF", 24)
+            if font_path:
                 self.font = pygame.font.Font(font_path, 24)
-            except Exception:
+            else:
                 self.font = pygame.font.Font(None, 24)
-        else:
+        except Exception as e:
+            info(f"加载字体失败: {e}")
             self.font = pygame.font.Font(None, 24)
 
     def draw_text(self, text, x, y, color=(255, 255, 255)):

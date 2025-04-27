@@ -3,6 +3,7 @@ import os
 from character import Character
 from event import Event, EventManager
 from common.logger import info, error
+from common.config_loader import ConfigLoader
 import random
 from common.save_manager import SaveManager
 
@@ -15,19 +16,27 @@ class GameManager:
         self.day = 1
         self.max_days = 30
         self.save_manager = SaveManager('save', default_save={})
+        self.config_loader = ConfigLoader('events', {
+            "start": {
+                "event_id": "start",
+                "description": "欢迎来到文字选择养成游戏！今天是你的第一天，你决定...",
+                "choices": [
+                    {"text": "去图书馆学习", "results": [
+                        {"desc": "你在图书馆学到了新知识。", "effects": {"intelligence": 2, "experience": 50}},
+                        {"desc": "你在图书馆遇到了一位老师，获得额外经验。", "effects": {"intelligence": 2, "experience": 80}}
+                    ], "next_event": "library"}
+                ]
+            },
+            "events": []
+        })
+        self.load_events()
         info(f"[GameManager] events loaded: {list(self.event_manager.events.keys())}")
 
-    def load_events(self, events_file=None):
+    def load_events(self):
         """加载事件数据到事件管理器"""
-        if events_file is None:
-            events_file = os.path.join(os.path.dirname(__file__), 'config', 'events.json')
-        info(f"[GameManager] load_events from {events_file}")
-        if not os.path.exists(events_file):
-            error(f"未找到事件数据文件: {events_file}")
-            return
+        info("[GameManager] load_events called")
         try:
-            with open(events_file, 'r', encoding='utf-8') as f:
-                events_data = json.load(f)
+            events_data = self.config_loader.load()
             # 加载主线事件
             for event_id, event_info in events_data.items():
                 if event_id == "events":
